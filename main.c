@@ -7,42 +7,41 @@
 #include "ardos/ardos.h"
 
 
-void f1()
+void p1()
 {
-    DDRD = 0x80;
+    ardos_pin_mode(9, ARDOS_OUT);
+    ardos_pin_mode(10, ARDOS_IN);
     
     for (; ; )
     {
-        PORTD ^= 0x80;
-        ardos_process_sleep(100);
+        if (ardos_digital_read(10))
+        {
+            ardos_digital_write(9, ARDOS_HIGH);
+            ardos_process_sleep(1000);
+            ardos_digital_write(9, ARDOS_LOW);
+            ardos_process_sleep(500);
+        }
     }
-
+    
     ardos_process_exit();
 }
 
-void f2()
+void _main()
 {
-    pid_t pid;
-    uint8_t on = 1;
-        
-    pid = ardos_process_create(f1);
-    ardos_enable_eint(ARDOS_EINT_0, ARDOS_EINT_RISING_EDGE);    
-        
+    ardos_pin_mode(7, ARDOS_OUT);
+    ardos_pin_mode(8, ARDOS_IN);
+
+    ardos_process_create(p1);
+
     for (; ; )
     {
-        ardos_process_wait_eint(ARDOS_EINT_0);
-        
-        if (on)
+        if (ardos_digital_read(8))
         {
-            ardos_process_suspend_other(pid);
+            ardos_digital_write(7, ARDOS_HIGH);
+            ardos_process_sleep(500);
+            ardos_digital_write(7, ARDOS_LOW);
+            ardos_process_sleep(500);
         }
-        else
-        {
-            ardos_process_resume(pid);
-        }
-        
-        on = !on;
-        ardos_process_sleep(200);
     }
 
     ardos_process_exit();
@@ -50,7 +49,9 @@ void f2()
 
 int main()
 {
-    ardos_init(f2);
+    ardos_init(_main);
+
+    for (; ; ) { }
 
     return 0;
 }
