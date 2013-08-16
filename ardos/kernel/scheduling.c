@@ -21,6 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "process_management.h"
 #include "scheduling.h"
+#include "serial.h"
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -191,8 +192,7 @@ void ardos_kernel_process_yield()
     ARDOS_ENTER_CRITICAL_SECTION();
     /* Stops the timer */
     STOP_TIMER1();
-    /* Sets the timer count in a
-     * state that is going to generate an interrupt */
+    /* Sets the timer count in a state that is going to generate an interrupt */
     TCNT1 = 14999;
     START_TIMER1();
     sei(); 
@@ -311,4 +311,31 @@ ISR(INT0_vect)
 ISR(INT1_vect)
 {
     wakeup_external_interrupt(1);
+}
+
+/* Serial interruptions */
+static void wakeup_serial_rx()
+{
+    uint8_t i;
+    /* Wakes up any process waiting for the interrupt */
+    for (i = wait_queue.size; i > 0; i--)
+    {
+        pid_t pid = sched_queue_dequeue(&wait_queue);
+        struct wait_event_t *we = ardos_kernel_get_process_waitevent(pid);
+        
+        if (we->code == ARDOS_SERIAL_RECV_WAIT_EVENT)
+        {
+            ardos_kernel_schedule(pid);
+            continue;
+        }
+        
+        sched_queue_enqueue(&wait_queue, pid);
+    }
+}
+
+ISR(USART_RX_vect)
+{
+    uint8_t data = UDR0;
+    ardos_kernel_serial_set_buffer(data);
+    wakeup_serial_rx();
 }

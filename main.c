@@ -1,25 +1,22 @@
 
 
-#include <avr/io.h>
-#include <avr/interrupt.h>
-#include <util/delay.h>
-
 #include "ardos/ardos.h"
 
-
-void p1()
+void t1()
 {
-    ardos_pin_mode(9, ARDOS_OUT);
-    ardos_pin_mode(10, ARDOS_IN);
-    
+    ardos_pin_mode(7, ARDOS_OUT);
+    ardos_digital_write(7, 1);
+
     for (; ; )
     {
-        if (ardos_digital_read(10))
+        if (ardos_serial_receive())
         {
-            ardos_digital_write(9, ARDOS_HIGH);
-            ardos_process_sleep(1000);
-            ardos_digital_write(9, ARDOS_LOW);
-            ardos_process_sleep(500);
+            ardos_serial_request();
+            ardos_serial_sends("\'b\' recebido\n\r");
+            ardos_serial_release();
+            ardos_digital_write(7, 0);
+            ardos_process_sleep(50);
+            ardos_digital_write(7, 1);
         }
     }
     
@@ -28,30 +25,31 @@ void p1()
 
 void _main()
 {
-    ardos_pin_mode(7, ARDOS_OUT);
-    ardos_pin_mode(8, ARDOS_IN);
+    ardos_serial_open(9600, ARDOS_NO_PARITY, ARDOS_1STOPBIT, ARDOS_8BIT_SERIAL);
 
-    ardos_process_create(p1);
-
-    for (; ; )
+    ardos_process_create(t1);
+    
+    ardos_pin_mode(8, ARDOS_OUT);
+    ardos_digital_write(8, 1);
+    
+    for (; ; ) 
     {
-        if (ardos_digital_read(8))
+        if (ardos_serial_receive())
         {
-            ardos_digital_write(7, ARDOS_HIGH);
-            ardos_process_sleep(500);
-            ardos_digital_write(7, ARDOS_LOW);
-            ardos_process_sleep(500);
-        }
+            ardos_serial_request();
+            ardos_serial_sends("\'a\' recebido\n\r");
+            ardos_serial_release();
+            ardos_digital_write(8, 0);
+            ardos_process_sleep(50);
+            ardos_digital_write(8, 1);
+        } 
     }
-
+    
     ardos_process_exit();
 }
 
 int main()
 {
     ardos_init(_main);
-
-    for (; ; ) { }
-
     return 0;
 }

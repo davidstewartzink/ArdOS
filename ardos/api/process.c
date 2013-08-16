@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../kernel/scheduling.h"
 
 #include "process.h"
+#include "serial_io.h"
 
 #include <avr/interrupt.h>
 
@@ -35,6 +36,8 @@ pid_t ardos_process_create(void (*thread)())
 
 void ardos_process_kill(pid_t pid)
 {
+    /* Release serial communication ownership */
+    ardos_serial_release();
     /* Destroys the process (critical section) */
     ardos_kernel_destroy_process(pid);
     /* Restore interrupts */
@@ -43,6 +46,8 @@ void ardos_process_kill(pid_t pid)
 
 void ardos_process_exit()
 {
+    /* Release serial communication ownership */
+    ardos_serial_release();
     /* Destroy this process */
     ardos_kernel_destroy_process(ardos_process_pid());
     /* Yields */

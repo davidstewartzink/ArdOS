@@ -25,10 +25,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 typedef uint8_t wevent_code_t;
-#define ARDOS_TIME_WAIT_EVENT      1
-#define ARDOS_JOIN_WAIT_EVENT      2
-#define ARDOS_INTERRUPT_WAIT_EVENT 3
-#define ARDOS_UNDEFINED_WAIT_EVENT 255
+#define ARDOS_TIME_WAIT_EVENT        1
+#define ARDOS_JOIN_WAIT_EVENT        2
+#define ARDOS_INTERRUPT_WAIT_EVENT   3
+#define ARDOS_SERIAL_RECV_WAIT_EVENT 4
+#define ARDOS_UNDEFINED_WAIT_EVENT   255
 
 
 /* Wait events' structures */

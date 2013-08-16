@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../kernel/process_management.h"
 #include "../kernel/scheduling.h"
 #include "../kernel/timer.h"
+#include "../kernel/analog.h"
 
 #include "ardos.h"
 
@@ -29,6 +30,7 @@ void ardos_init(void (*main_thread)())
     /* Init kernel modules */
     ardos_kernel_process_management_init();
     ardos_kernel_scheduling_init();
+    ardos_kernel_analog_init();
     ardos_kernel_timer_init();
     /* Creates the main process */
     ardos_kernel_create_process(main_thread);

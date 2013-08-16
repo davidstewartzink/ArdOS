@@ -28,7 +28,7 @@ extern "C" {
 /* Initializes the SCHEDULING module */
 extern void ardos_kernel_scheduling_init();
 
-/* Tells the scheduler to start scheduling
+ /* Tells the scheduler to start scheduling
  * a given process */
 extern void ardos_kernel_schedule(pid_t pid);
 extern void ardos_kernel_reschedule(pid_t pid);

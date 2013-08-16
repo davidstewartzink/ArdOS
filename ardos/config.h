@@ -39,6 +39,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * of the processes */
 #define ARDOS_CONFIG_PROCESS_STACK_SIZE 0x100
 
+/* Device clock frequency */
+#define ARDOS_CLOCK_FREQ 16000000UL
 
 /* Size (in bytes) of the processes' hardware context */
 #define ARDOS_CONFIG_HWCONTEXT_SIZE 0x23
